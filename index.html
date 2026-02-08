@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>A Small Surprise For Shree</title>
+  <style>
+    :root{
+      --bg1:#fff0f6;
+      --accent:#ff4d6d;
+      --muted:#6b5b6b;
+      --card:#ffffffcc;
+      --success:#7ef0c7;
+    }
+    html,body{height:100%;margin:0;font-family:Inter, "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Arial;}
+    body{
+      background: linear-gradient(135deg,var(--bg1) 0%, #ffdfe8 40%, #fff7fb 100%);
+      color:#2b1b2b;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .app {
+      width:100%;
+      max-width:980px;
+      margin:28px auto;
+      position:relative;
+      min-height:760px;
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow: 0 30px 80px rgba(20,10,20,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.96));
+      padding:28px;
+      box-sizing:border-box;
+    }
+
+    .page { display:none; position:relative; z-index:2; min-height:560px; box-sizing:border-box; padding:28px; text-align:center; }
+    .page.active { display:block; }
+
+    .intro { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:18px; height:100%; }
+    .title { font-size:22px; color:var(--accent); font-weight:800; letter-spacing:0.6px; }
+    .open-link { display:inline-block; margin-top:8px; padding:14px 20px; border-radius:999px; background:linear-gradient(90deg,var(--accent), #ff7aa0); color:white; border:none; cursor:pointer; box-shadow: 0 12px 30px rgba(255,77,109,0.12); font-weight:800; font-size:16px; }
+    .subline { color:var(--muted); font-size:14px; margin-top:6px; }
+
+    .pop-wrap { display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:12px; }
+    .pop-line { display:flex; gap:10px; justify-content:center; font-size:28px; font-weight:800; color:#ff4d6d; flex-wrap:wrap; }
+    .pop-line span { opacity:0; transform:scale(0.6) translateY(18px); display:inline-block; }
+    @keyframes popIn { 0% { opacity:0; transform:scale(0.6) translateY(18px) } 60% { opacity:1; transform:scale(1.12) translateY(-6px) } 100% { opacity:1; transform:scale(1) translateY(0) } }
+
+    .typewriter { overflow:hidden; border-right:.12em solid rgba(59,27,43,0.6); white-space:nowrap; margin:0 auto; letter-spacing:.04em; width:0; font-size:20px; font-weight:700; color:#4a2030; }
+    .typewriter.animate { animation: typing 2.6s steps(40,end) forwards, blink-caret .8s step-end infinite 2.8s; }
+    @keyframes typing { from { width:0 } to { width:100% } } @keyframes blink-caret { 50% { border-color:transparent } }
+
+    .transition-screen { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; height:100%; background: radial-gradient(circle at 50% 40%, rgba(255,122,160,0.06), transparent 30%); animation: fadeInQuick .45s ease both; }
+    @keyframes fadeInQuick { from { opacity:0; transform:scale(0.98) } to { opacity:1; transform:scale(1) } }
+
+    .card { margin:18px auto; width:86%; max-width:720px; background:var(--card); border-radius:14px; padding:22px; box-shadow: 0 12px 40px rgba(20,10,20,0.06); text-align:center; }
+    .banner { font-size:28px; font-weight:800; color:#3b1b2b; margin:6px 0; white-space:nowrap; overflow:hidden; border-right:.12em solid rgba(59,27,43,0.6); width:0; display:inline-block; }
+    .banner.animate { animation: typing 2.6s steps(36,end) 0.2s forwards, blink-caret .8s step-end infinite 2.9s; }
+    .opening-image { width:320px; max-width:86%; border-radius:12px; display:block; margin:14px auto; box-shadow: 0 18px 40px rgba(255,122,160,0.06); transform-origin:center; opacity:0; transform: translateY(8px) scale(0.99); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.9,.2,1); }
+    .opening-image.visible { opacity:1; transform: translateY(0) scale(1); }
+    .cta { display:inline-block; margin-top:14px; padding:12px 20px; border-radius:999px; background:linear-gradient(90deg,var(--accent), #ff7aa0); color:white; border:none; cursor:pointer; font-weight:800; box-shadow: 0 12px 30px rgba(255,77,109,0.12); }
+    .cta.pulse { animation: pulse 1.8s ease-in-out infinite; } @keyframes pulse { 0%{ transform:scale(1) } 50%{ transform:scale(1.03) } 100%{ transform:scale(1) } }
+
+    .loader-wrap { width:86%; max-width:640px; margin: 10px auto 0; }
+    .loader-text { font-size:18px; color:#3b1b2b; margin-bottom:12px; }
+    .progress { height:18px; background: rgba(59,27,43,0.06); border-radius:999px; overflow:hidden; border:1px solid rgba(59,27,43,0.03); }
+    .progress > .bar { height:100%; width:0%; background: linear-gradient(90deg,#ff7aa0,var(--accent)); transition: width 0.2s linear; }
+
+    .question-card { width:86%; max-width:760px; margin: 12px auto; padding:22px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.98)); box-shadow: 0 12px 40px rgba(20,10,20,0.06); display:flex; flex-direction:column; align-items:center; }
+    .question-text { font-size:22px; color:#000; min-height:72px; display:block; opacity:0; transform:translateX(40px); transition: all .48s cubic-bezier(.2,.9,.2,1); font-weight:800; text-align:center; margin-bottom:18px; }
+    .question-text.in { opacity:1; transform:translateX(0); }
+    .question-text.out { opacity:0; transform:translateX(-40px); }
+    .answers { display:flex; gap:14px; justify-content:center; margin-top:6px; align-items:center; }
+    .btn-yes, .btn-no { padding:12px 18px; border-radius:999px; border:none; cursor:pointer; font-weight:800; font-size:15px; }
+    .btn-yes { background: linear-gradient(90deg,#7ef0c7,#4dd6a6); color:#053022; box-shadow: 0 10px 24px rgba(34,153,120,0.08); }
+    .btn-no { background: linear-gradient(90deg,#ffd1d9,#ff9fb3); color:#3b0011; position:relative; box-shadow: 0 10px 24px rgba(255,122,160,0.06); }
+    .no-msg { color:#7a4a5a; margin-top:10px; opacity:0; transition:opacity .25s ease; font-weight:700; }
+
+    .scenario { width:86%; max-width:760px; margin:12px auto; text-align:left; padding:18px; border-radius:12px; background:var(--card); }
+    .scenario p { margin:8px 0; line-height:1.5; color:#3b1b2b; }
+    textarea#response { width:100%; min-height:140px; padding:12px; border-radius:10px; border:1px solid rgba(59,27,43,0.06); box-sizing:border-box; resize:vertical; font-size:15px; }
+
+    .popup { position:fixed; inset:0; background:rgba(0,0,0,0.42); display:none; align-items:center; justify-content:center; z-index:999; }
+    .popup.show { display:flex; animation: fadeIn .28s ease both; }
+    .popup-content { background:#fff; padding:20px 26px; border-radius:12px; text-align:center; box-shadow:0 12px 30px rgba(0,0,0,0.2); transform:scale(0.9); opacity:0; animation: popUp .36s ease .06s forwards; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} } @keyframes popUp { to{transform:scale(1); opacity:1} }
+
+    .final { padding:28px; text-align:center; }
+    .final h2 { margin:0 0 8px 0; color:#3b1b2b; transform:scale(.98); opacity:0; transition: all .6s cubic-bezier(.2,.9,.2,1); }
+    .final p { color:#4a2b3a; line-height:1.5; margin:8px 0 0 0; opacity:0; transform:translateY(8px); transition: all .6s cubic-bezier(.2,.9,.2,1) .12s; }
+    .final.show h2 { transform:scale(1); opacity:1; } .final.show p { transform:translateY(0); opacity:1; }
+
+    @media (max-width:640px){
+      .banner { font-size:20px; } .opening-image { width:86%; } .card { padding:16px; } .question-text { font-size:18px; min-height:84px; }
+      .pop-line { font-size:20px; gap:8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" role="main" aria-live="polite">
+
+    <!-- Landing -->
+    <section id="page-landing" class="page active" aria-label="Landing">
+      <div class="intro">
+        <div class="title">A little surprise for Shree</div>
+        <button id="openLink" class="open-link" aria-label="Open surprise">Open your surprise 💌</button>
+        <div class="subline">Click to begin — it's made with love by Arijeet</div>
+      </div>
+    </section>
+
+    <!-- Pop-in intro -->
+    <section id="page-pop" class="page" aria-label="Pop Intro">
+      <div class="pop-wrap">
+        <div id="popLine" class="pop-line" aria-hidden="true">
+          <span>A</span><span>Small</span><span>Surprise</span><span>For</span><span>Shree</span><span>💗😘</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Love line -->
+    <section id="page-love" class="page" aria-label="Love line">
+      <div class="love-line">
+        <div id="loveLine" class="typewriter">Someone Has made this with all love 💗💘</div>
+      </div>
+    </section>
+
+    <!-- Transition -->
+    <section id="page-transition" class="page" aria-label="Transition">
+      <div class="transition-screen" role="img" aria-hidden="true">
+        <svg width="160" height="160" viewBox="0 0 120 120" aria-hidden="true">
+          <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#ff9fb3"/><stop offset="1" stop-color="#ff4d6d"/></linearGradient></defs>
+          <g transform="translate(10,10)">
+            <path d="M50 10 C65 -5, 95 10, 50 70 C5 10, 35 -5, 50 10 Z" fill="url(#g1)" opacity="0.95">
+              <animate attributeName="opacity" values="0;0.95;0" dur="1.6s" repeatCount="1" fill="freeze" />
+              <animateTransform attributeName="transform" type="scale" from="0.6" to="1" dur="1.6s" fill="freeze" />
+            </path>
+          </g>
+        </svg>
+        <div style="font-weight:700; color:var(--accent); font-size:18px;">Hold on, making it perfect…</div>
+      </div>
+    </section>
+
+    <!-- Opening Wish -->
+    <section id="page-wish" class="page" aria-label="Opening Wish">
+      <div class="card">
+        <div style="height:56px; display:flex; align-items:center; justify-content:center;">
+          <div id="banner" class="banner">HAPPY PROPOSE DAY MY BABE 💖</div>
+        </div>
+        <div class="subline">made with love by Arijeet 💕</div>
+        <img id="openingImage" class="opening-image" src="US.jpg" alt="Opening image">
+        <div>
+          <button id="startBtn" class="cta pulse" aria-label="Start the surprise">Click here for some stuffs made by Arijeet 😉</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading -->
+    <section id="page-loading" class="page" aria-label="Loading">
+      <div class="card">
+        <div class="loader-wrap">
+          <div class="loader-text">Loading Something For You babe 😉</div>
+          <div class="progress" aria-hidden="true"><div class="bar" id="progressBar"></div></div>
+          <div class="subline" style="margin-top:12px;">Just a sec — adding a little sparkle ✨</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Questions -->
+    <section id="page-questions" class="page" aria-label="Flirty Questions">
+      <div class="question-card" role="region" aria-labelledby="questionText">
+        <div id="questionText" class="question-text" aria-live="polite" aria-atomic="true"></div>
+
+        <div class="answers" style="margin-top:6px;">
+          <button id="yesBtn" class="btn-yes" aria-label="Yes">YES 💖</button>
+          <button id="noBtn" class="btn-no" aria-label="No">NO 😒</button>
+        </div>
+
+        <div class="no-msg" id="tryMsg" aria-hidden="true">Arre Shree, NO toh allowed hi nahi hai 😁💕</div>
+      </div>
+    </section>
+
+    <!-- Scenario -->
+    <section id="page-scenario" class="page" aria-label="Romantic Scenario">
+      <div class="scenario">
+        <p style="font-weight:700; margin-top:0;">Shree imagine kro...</p>
+        <p>Hamdono ek long drive pe gaye hai... main driving kar raha hoon aur tum side seat par ho. Tumhara haath gear box par hai aur main ussi haath ko pakad ke gear shift karu. Waqt hai 2 AM aur gaana baj raha hai <em>Tere Liye</em>. Batao tumhe kaisa feel hoga?</p>
+
+        <form id="responseForm" action="https://formspree.io/f/maqdykok" method="POST">
+          <textarea id="response" name="response" required maxlength="200" placeholder="Tumhara feel likho..."></textarea>
+          <div class="submit-wrap" style="display:flex; justify-content:flex-end; margin-top:12px;">
+            <button type="submit" id="submitBtn" class="cta">Send responce to Arijeet</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Final -->
+    <section id="page-final" class="page final" aria-label="Final Message">
+      <div class="final card" style="text-align:center;">
+        <h2 id="finalHeading">Thanks My Pretty Little babyyy 💗😘💕</h2>
+        <p id="finalText">Remember you are mine and you will be mine forever.. Baki sab gye bhaad ma ... yaad ha na maine kya bola tha kal... wish krna is formality but tumhe mehsoos krwana is my speciality 😉😘</p>
+        <div style="margin-top:12px; font-weight:700;">Byeeeee</div>
+      </div>
+    </section>
+
+    <!-- Popup confirmation -->
+    <div id="popup" class="popup" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="popup-content">
+        <p id="popupMsg" style="margin:0 0 12px 0; font-weight:700;">Your Msg is sent to aaravarijeet@gmail.com</p>
+        <button id="popupOk" class="cta">OK</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Page refs
+    const pages = {
+      landing: document.getElementById('page-landing'),
+      pop: document.getElementById('page-pop'),
+      love: document.getElementById('page-love'),
+      transition: document.getElementById('page-transition'),
+      wish: document.getElementById('page-wish'),
+      loading: document.getElementById('page-loading'),
+      questions: document.getElementById('page-questions'),
+      scenario: document.getElementById('page-scenario'),
+      final: document.getElementById('page-final')
+    };
+
+    function showPage(page) {
+      Object.values(pages).forEach(p => p.classList.remove('active'));
+      page.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Elements for flow
+    const openLink = document.getElementById('openLink');
+    const popLine = document.getElementById('popLine');
+    const loveLine = document.getElementById('loveLine');
+    const banner = document.getElementById('banner');
+    const openingImage = document.getElementById('openingImage');
+    const startBtn = document.getElementById('startBtn');
+    const progressBar = document.getElementById('progressBar');
+
+    // Questions (exact lines provided)
+    const questions = [
+      "Tum meri candle ho… kya main tumhara flame ban jaun?",
+      "Shree, tu meri charger ho… kya main tumhara phone ban jaun?",
+      "Shree, tum meri lock ho… kya mai tumhara key ban jau 😁",
+      "Shree, tu meri playlist ho… kya main tumhara favorite song ban jaun?"
+    ];
+    let qIndex = 0;
+    const qText = document.getElementById('questionText');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const tryMsg = document.getElementById('tryMsg');
+
+    // Popup and form
+    const responseForm = document.getElementById('responseForm');
+    const responseField = document.getElementById('response');
+    const submitBtn = document.getElementById('submitBtn');
+    const popup = document.getElementById('popup');
+    const popupOk = document.getElementById('popupOk');
+    const finalSection = document.getElementById('page-final');
+
+    // Landing -> Pop-in -> Typewriter -> Transition -> Wish
+    openLink.addEventListener('click', () => {
+      showPage(pages.pop);
+      const spans = Array.from(popLine.querySelectorAll('span'));
+      spans.forEach((s, i) => {
+        s.style.animation = `popIn .48s cubic-bezier(.2,.9,.2,1) ${0.12 + i*0.34}s forwards`;
+      });
+
+      setTimeout(() => {
+        showPage(pages.love);
+        loveLine.classList.remove('animate');
+        void loveLine.offsetWidth;
+        loveLine.classList.add('animate');
+
+        setTimeout(() => {
+          showPage(pages.transition);
+
+          setTimeout(() => {
+            showPage(pages.wish);
+            banner.classList.remove('animate');
+            void banner.offsetWidth;
+            banner.classList.add('animate');
+            setTimeout(() => openingImage.classList.add('visible'), 700);
+          }, 1400);
+        }, 3000);
+      }, 2400);
+    });
+
+    // Start -> Loading -> Questions (fixed trigger)
+    startBtn.addEventListener('click', () => {
+      showPage(pages.loading);
+      progressBar.style.width = '0%';
+      let pct = 0;
+      const total = 3000;
+      const step = 40;
+      const interval = setInterval(() => {
+        pct = Math.min(100, pct + (step/total)*100);
+        progressBar.style.width = pct + '%';
+        if (pct >= 100) {
+          clearInterval(interval);
+          setTimeout(() => startQuestions(), 350); // ensure questions start
+        }
+      }, step);
+    });
+
+    function startQuestions() {
+      qIndex = 0;
+      showPage(pages.questions);
+      qText.classList.remove('in','out');
+      qText.textContent = questions[qIndex];   // inject first question (black)
+      setTimeout(() => qText.classList.add('in'), 60);
+    }
+
+    yesBtn.addEventListener('click', () => {
+      qText.classList.remove('in');
+      qText.classList.add('out');
+      setTimeout(() => {
+        qIndex++;
+        if (qIndex < questions.length) {
+          qText.classList.remove('out');
+          qText.textContent = questions[qIndex];
+          setTimeout(() => qText.classList.add('in'), 60);
+        } else {
+          showPage(pages.scenario);
+          setTimeout(() => { if (responseField) responseField.focus(); }, 300);
+        }
+      }, 520);
+    });
+
+    // NO playful behavior
+    let noAttempts = 0;
+    noBtn.addEventListener('mouseenter', () => {
+      noAttempts++;
+      const tx = (Math.random() > 0.5 ? 1 : -1) * (40 + Math.random() * 80);
+      const ty = (Math.random() > 0.5 ? 1 : -1) * (6 + Math.random() * 18);
+      noBtn.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random()*20-10)}deg)`;
+      noBtn.style.transition = 'transform .35s cubic-bezier(.2,.9,.2,1)';
+      tryMsg.style.opacity = 1;
+      tryMsg.setAttribute('aria-hidden','false');
+      setTimeout(() => { tryMsg.style.opacity = 0; tryMsg.setAttribute('aria-hidden','true'); }, 1200);
+      if (noAttempts > 4) {
+        noBtn.style.opacity = 0.7 + Math.random()*0.3;
+        setTimeout(() => noBtn.style.opacity = 1, 700);
+      }
+    });
+    noBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      noBtn.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-8px)' }, { transform: 'translateX(8px)' }, { transform: 'translateX(0)' }], { duration: 420, easing: 'ease-in-out' });
+      tryMsg.style.opacity = 1;
+      tryMsg.setAttribute('aria-hidden','false');
+      setTimeout(() => { tryMsg.style.opacity = 0; tryMsg.setAttribute('aria-hidden','true'); }, 1200);
+    });
+
+    // Formspree submission + popup + final transition
+    if (responseForm) {
+      responseForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = responseField.value.trim();
+        if (!text) { responseField.focus(); return; }
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        try {
+          const formData = new FormData(responseForm);
+          await fetch(responseForm.action, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
+        } catch (err) {
+          // ignore network errors for UX; still show popup
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send responce to Arijeet';
+          popup.setAttribute('aria-hidden','false');
+          popup.classList.add('show');
+        }
+      });
+    }
+
+    popupOk.addEventListener('click', () => {
+      popup.classList.remove('show');
+      popup.setAttribute('aria-hidden','true');
+      showPage(pages.final);
+      setTimeout(() => { finalSection.classList.add('show'); }, 260);
+    });
+
+    // Accessibility: keyboard support
+    yesBtn.addEventListener('keyup', (e) => { if (e.key === 'Enter') yesBtn.click(); });
+    noBtn.addEventListener('keyup', (e) => { if (e.key === 'Enter') noBtn.click(); });
+    popupOk.addEventListener('keyup', (e) => { if (e.key === 'Enter') popupOk.click(); });
+
+    // Image load handling
+    openingImage.addEventListener('load', () => openingImage.classList.add('visible'));
+    openingImage.addEventListener('error', () => openingImage.style.display = 'none');
+
+    // If user reloads on wish page, animate banner
+    document.addEventListener('DOMContentLoaded', () => {
+      if (pages.wish.classList.contains('active')) {
+        banner.classList.add('animate');
+        setTimeout(() => openingImage.classList.add('visible'), 700);
+      }
+    });
+  </script>
+</body>
+</html>
